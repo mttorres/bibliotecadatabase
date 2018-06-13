@@ -1,0 +1,58 @@
+
+
+
+
+-- FUNÇÕES 
+
+
+--calcula a divida(multa de um aluno)
+--V1: nao sei se faria mt sentido... afinal a multa poderia aumentar a cada dia sem pagar!
+-- então ela teria que ser recalculada SEMPRE!
+
+CREATE OR REPLACE FUNCTION divida(usr_id INTEGER) 
+RETURNS DEC(10,2) AS $$
+
+DECLARE
+    cur CURSOR(i INTEGER) FOR SELECT * FROM multas WHERE usr_id = id_cobr AND pago = FALSE ;
+	c_row multas RECORD;
+	total DEC(10,2);
+	
+BEGIN 
+	OPEN cur(usr_id);
+	total :=0;
+	IF usr_id IS NOT NULL THEN
+		FOR c_row IN cur LOOP
+			total := total +  c_row.valor 
+		END LOOP
+	END IF;
+	RETURN total;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+-- V2, a tabela de multas poderia ter ... a data de emissão da multa! de quando a multa foi registrada, 
+-- e então ele iria até a tabela de emprestimos e calcularia com base na diferença da data de expiração
+-- e o dia atual, (obviamente se nao foi paga ainda)
+
+CREATE OR REPLACE FUNCTION divida(usr_id INTEGER) 
+RETURNS DEC(10,2) AS $$
+
+DECLARE
+    cur CURSOR(i INTEGER) FOR SELECT * FROM multas WHERE usr_id = id_cobr AND pago = FALSE ;
+	c_row multas RECORD;
+	total DEC(10,2);
+	
+BEGIN 
+	OPEN cur(usr_id);
+	total :=0;
+	IF usr_id IS NOT NULL THEN
+		FOR c_row IN cur LOOP
+			--...
+		END LOOP
+	END IF;
+	RETURN total;
+END;
+$$
+LANGUAGE plpgsql;
