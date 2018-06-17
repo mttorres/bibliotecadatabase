@@ -106,16 +106,27 @@
 --   );
 
 
-CREATE TABLE reserva (
-	id_res int NOT NULL,
-	usr_id int NOT NULL,
- 	exm_id int NOT NULL,
-	data_r timestamp NOT NULL,
-	CONSTRAINT exemplar_fk FOREIGN KEY(exm_id) REFERENCES exemplar(exm_id),
- 	CONSTRAINT usuario_fk FOREIGN KEY(usr_id) REFERENCES usuario(usr_id)
+-- CREATE TABLE reserva (
+-- 	id_res int NOT NULL,
+-- 	ISBN int NOT NULL,
+--  	usr_id int NOT NULL,
+-- 	data_r timestamp NOT NULL,
+-- 	CONSTRAINT reserva_pk PRIMARY KEY(id_res),
+-- 	CONSTRAINT livro_fk FOREIGN KEY(ISBN) REFERENCES livro(ISBN),
+--  	CONSTRAINT usuario_fk FOREIGN KEY(usr_id) REFERENCES usuario(usr_id)
 
 
-);
+-- );
+
+-- CREATE TABLE suspensoes (
+-- 	usr_id int NOT NULL,
+-- 	data_s timestamp NOT NULL,
+-- 	dias int,
+-- 	CONSTRAINT susp_pk PRIMARY KEY(usr_id),
+--  	CONSTRAINT usuario_fk FOREIGN KEY(usr_id) REFERENCES usuario(usr_id)
+
+
+-- );
 
 
 
