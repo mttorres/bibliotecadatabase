@@ -3,7 +3,7 @@
 
 
 -- FUNÇÕES 
-
+--I:
 
 --calcula a divida(multa de um aluno)
 --V1: nao sei se faria mt sentido... afinal a multa poderia aumentar a cada dia sem pagar!
@@ -56,3 +56,7 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+
+
+--II:
