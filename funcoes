@@ -1,62 +1,57 @@
+-- funções:
 
-
-
-
--- FUNÇÕES 
---I:
-
---calcula a divida(multa de um aluno)
---V1: nao sei se faria mt sentido... afinal a multa poderia aumentar a cada dia sem pagar!
--- então ela teria que ser recalculada SEMPRE!
-
+-- I
 CREATE OR REPLACE FUNCTION divida(usr_id INTEGER) 
 RETURNS DEC(10,2) AS $$
 
 DECLARE
-    cur CURSOR(i INTEGER) FOR SELECT * FROM multas WHERE usr_id = id_cobr AND pago = FALSE ;
-	c_row multas RECORD;
+    cur CURSOR(usr_id INTEGER) FOR SELECT data_inic,data_exp,data_dev 
+	FROM emprestimo WHERE usr_id = usr_id AND multa = TRUE AND data_paga is NULL ;
+	c_row RECORD;
 	total DEC(10,2);
 	
 BEGIN 
 	OPEN cur(usr_id);
 	total :=0;
 	IF usr_id IS NOT NULL THEN
-		FOR c_row IN cur LOOP
-			total := total +  c_row.valor 
-		END LOOP
+		FOR c_row IN cur(usr_id) 
+		LOOP
+			IF (c_row.data_dev is NULL) THEN -- ainda nao devolveu o livro
+				total:= total + (5+(cast(DATE_PART('day',now()::timestamp - c_row.data_exp::timestamp) AS DEC(10,2))*0.5));
+			ELSE -- devolveu eventualmente
+				total:= total + (5+(cast(DATE_PART('day',c_row.data_dev::timestamp - c_row.data_exp::timestamp) AS DEC(10,2))*0.5));
+			END IF;
+		END LOOP;	
 	END IF;
+	RETURN total;
 	RETURN total;
 END;
 $$
 LANGUAGE plpgsql;
 
 
+-- II:
 
--- V2, a tabela de multas poderia ter ... a data de emissão da multa! de quando a multa foi registrada, 
--- e então ele iria até a tabela de emprestimos e calcularia com base na diferença da data de expiração
--- e o dia atual, (obviamente se nao foi paga ainda)
+CREATE OR REPLACE FUNCTION maisemprestados() 
+RETURNS TABLE(exm_id INTEGER, ISBN INTEGER, titulo character varying, edicao character varying, total BIGINT) AS $$
 
-CREATE OR REPLACE FUNCTION divida(usr_id INTEGER) 
-RETURNS DEC(10,2) AS $$
+BEGIN
+	RETURN QUERY
+		SELECT emprestimo.exm_id, exemplar.ISBN, livro.titulo, livro.edicao, COUNT(emp_id)
+		FROM 
+		emprestimo INNER JOIN exemplar ON emprestimo.exm_id = exemplar.exm_id 
+		INNER JOIN livro ON exemplar.ISBN = livro.ISBN   
+		GROUP BY
+		emprestimo.exm_id, 
+		exemplar.ISBN, 
+		livro.titulo, 
+		livro.edicao
+		HAVING COUNT(emp_id) >30;
+		
 
-DECLARE
-    cur CURSOR(i INTEGER) FOR SELECT * FROM multas WHERE usr_id = id_cobr AND pago = FALSE ;
-	c_row multas RECORD;
-	total DEC(10,2);
-	
-BEGIN 
-	OPEN cur(usr_id);
-	total :=0;
-	IF usr_id IS NOT NULL THEN
-		FOR c_row IN cur LOOP
-			--...
-		END LOOP
-	END IF;
-	RETURN total;
 END;
 $$
 LANGUAGE plpgsql;
 
 
 
---II:
