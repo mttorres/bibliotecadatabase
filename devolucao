@@ -18,11 +18,7 @@ diastodos int;
 
 BEGIN
 
-IF(TG_OP = 'UPDATE') THEN
 
-
-
-END IF;
 		-- verifica se o emprestimo nao deixa atualizar um livro e um dono de emprestimo
 		IF(OLD.exm_id <> NEW.exm_id) THEN
 			RAISE EXCEPTION 'Não é possivel alterar um exemplar de um emprestimo!';
@@ -98,6 +94,7 @@ END IF;
 		
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER devolucao BEFORE UPDATE ON emprestimo
 FOR EACH ROW EXECUTE PROCEDURE atualizadev();
