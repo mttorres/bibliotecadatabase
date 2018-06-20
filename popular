@@ -84,7 +84,7 @@
  	exm_id int NOT NULL,
  	data_inic timestamp not null,
  	data_exp timestamp not null,
- 	data_dev timestamp,
+ 	data_dev timestamp default NULL,
 	multa boolean default FALSE,
 	data_paga timestamp default NULL, 
  	CONSTRAINT emprestimo_pk PRIMARY KEY(emp_id),
