@@ -67,7 +67,6 @@ DECLARE
 	teste char[];
 BEGIN
 	teste = string_to_array(rg,null);
-	raise notice 'teste 10: %', teste[8];
 	if(array_length(teste, 1) != 9) then
 		raise exception 'tamanho nao compativel';
 	end if;
@@ -82,13 +81,9 @@ BEGIN
 		soma = soma + aux;
 		i = i -1;
 	end loop;
-	raise notice 'soma: %', soma;
-	
+
 	aux = CAST(teste[1] AS INTEGER);
 	dvEsperado = 10 - mod(soma, 10);
-	
-	raise notice 'dv esperado: %', dvEsperado;
-	raise notice 'aux: %', aux;
 
 	if(aux = dvEsperado) then
 		return true;
