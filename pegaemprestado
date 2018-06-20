@@ -10,7 +10,7 @@ teste5 RECORD;
 
 BEGIN	
 	-- regras que definem uma inserção(emprestimo valido)
-		IF( ( (NEW.multa == TRUE) OR (NEW.data_paga is not NULL) ) ) THEN
+		IF( ( (NEW.multa = TRUE) OR (NEW.data_paga is not NULL) ) ) THEN
 				RAISE EXCEPTION 'emprestimos nao podem iniciar com multa, favor alterar após a inserção';
 		END IF;	
 		-- coerencia de devolução ao inserir
@@ -18,7 +18,7 @@ BEGIN
 				RAISE EXCEPTION 'emprestimos nao podem iniciar com devoluções, favor alterar após a inserção';
 		END IF;	
 		-- coerencia de datas
-		IF( cast(DATE_PART('day',NEW.data_exp - NEW.data_inic) AS integer) == 7 ) THEN
+		IF( cast(DATE_PART('day',NEW.data_exp - NEW.data_inic) AS integer) = 7 ) THEN
 			RAISE EXCEPTION 'periodo de emprestimo INVALIDO!';
 		
 		END IF;
@@ -28,7 +28,7 @@ BEGIN
 				RAISE EXCEPTION 'ERRO! O Exemplar referido nao esta disponivel para emprestimo';
 		END IF;
 		-- SE EXISTIR PELO MENOS UMA MULTA em nome desse usuario que nao tenha sido paga nao pode pegar livros ainda
-		IF (EXISTS(SELECT 1 FROM emprestimo WHERE multa == TRUE AND data_paga is NULL AND usr_id = NEW.usr_id)) THEN
+		IF (EXISTS(SELECT 1 FROM emprestimo WHERE multa = TRUE AND data_paga is NULL AND usr_id = NEW.usr_id)) THEN
 			RAISE EXCEPTION 'o usuario tem multas pendentes';
 		END IF;
 		-- verifica se nao esta suspenso
@@ -38,7 +38,7 @@ BEGIN
 		END IF;
 		-- limite de 5 livros por usuario
   		SELECT COUNT(*) AS total INTO teste1 FROM emprestimo WHERE usr_id = NEW.usr_id AND data_dev is NULL; 
-		IF(cast(teste1.total AS INTEGER) == 5 ) THEN
+		IF(cast(teste1.total AS INTEGER) = 5 ) THEN
 			RAISE EXCEPTION 'o usuario nao pode pegar mais livros'; 
 		END IF;
 		-- verifica se nao tem RESERVA DESSE LIVRO em nome de outro usuario!(reservas só valem até 3 dias!) 
@@ -54,3 +54,4 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER pegaemprestado BEFORE INSERT ON emprestimo
 FOR EACH ROW EXECUTE PROCEDURE validaemprestimo();
+

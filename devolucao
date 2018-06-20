@@ -31,7 +31,7 @@ END IF;
 			RAISE EXCEPTION 'Não é possivel alterar o dono de um emprestimo';
 		END IF;
 		-- coerencia da datas:
-		IF( cast(DATE_PART('day',NEW.data_exp - NEW.data_inic) AS integer) == 7 ) THEN
+		IF( cast(DATE_PART('day',NEW.data_exp - NEW.data_inic) AS integer) = 7 ) THEN
 			RAISE EXCEPTION 'periodo de emprestimo INVALIDO!';
 		END IF;
 		IF(NEW.data_dev < NEW.data_inic ) THEN 
@@ -41,14 +41,14 @@ END IF;
 			RAISE EXCEPTION 'data de pagamento de multa INVALIDA!';
 		END IF;	
 		-- coerencia da multa e entrega 
-		IF(NEW.multa == FALSE AND NEW.data_paga is not NULL) THEN
+		IF(NEW.multa = FALSE AND NEW.data_paga is not NULL) THEN
 				RAISE EXCEPTION 'esse emprestimo nao possui multa! Como pode uma multa nao existente ter sido paga?!'; -- so atualizou a data de multa e nao a flag de multa
 		END IF;
 		IF((NEW.data_paga is not NULL AND NEW.data_dev is NULL)  or(NEW.data_paga < NEW.data_dev ) ) THEN
 			RAISE EXCEPTION 'incoerencia! uma multa deve ser paga no dia de devolução ou depois';
 		END IF;
 		
-		IF(NEW.multa == TRUE AND NEW.data_dev < NEW.data_exp) THEN
+		IF(NEW.multa = TRUE AND NEW.data_dev < NEW.data_exp) THEN
 			RAISE EXCEPTION 'o usuario na verdade nao possui multa!';
 		END IF;
 		
@@ -56,7 +56,7 @@ END IF;
 				RAISE EXCEPTION 'NAO É POSSIVEL ALTERAR A DATA DE PAGAMENTO OU DEVOLUÇÃO APÓS O REGISTRO DELAS';
 		END IF;
 		-- entrega de livro(update de dev) ou nao de de livro(update de multa) resulta no calculo ou nao suspensao no criterio: CONTAR QUANTAS MULTAS ELE ja TEM EM UM PERIODO DE UM MES NESSE ANO
-		IF((NEW.data_dev <> OLD.data_dev AND NEW.data_dev > NEW.data_exp) OR NEW.multa == TRUE) THEN
+		IF((NEW.data_dev <> OLD.data_dev AND NEW.data_dev > NEW.data_exp) OR NEW.multa = TRUE) THEN
 			SELECT COUNT(*) AS total INTO teste3 FROM emprestimo 
 			WHERE ( ( DATE_PART('month',data_exp) = DATE_PART('month',now()) ) 
 				   AND ( DATE_PART('year',data_exp) = DATE_PART('year',now()) )  
@@ -64,7 +64,7 @@ END IF;
 			IF(cast(teste3.total AS INTEGER) >= 2 ) THEN
 				-- suspenso!
 				diastodos = cast(teste3.total AS INTEGER)*5; -- para cada livro atrasado anteriormente
-				IF(NEW.data_dev is NULL OR NEW.data_dev == OLD.data_dev) THEN -- livro nao foi devolvido ainda
+				IF(NEW.data_dev is NULL OR NEW.data_dev = OLD.data_dev) THEN -- livro nao foi devolvido ainda
 					diaslivro = cast(DATE_PART('day',now()::timestamp - NEW.data_exp::timestamp) AS integer)*2; 	
 				ELSE
 					diaslivro = cast(DATE_PART('day',NEW.data_dev::timestamp - NEW.data_exp::timestamp) AS integer)*2; -- para esse livro		
