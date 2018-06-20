@@ -32,21 +32,23 @@ LANGUAGE plpgsql;
 
 -- II:
 
-CREATE OR REPLACE FUNCTION maisemprestados() 
+CREATE OR REPLACE FUNCTION maisemprestados(mesinter integer) 
 RETURNS TABLE(exm_id INTEGER, ISBN INTEGER, titulo character varying, edicao character varying, total BIGINT) AS $$
 
 BEGIN
-	RETURN QUERY
+	RETURN QUERY EXECUTE'
 		SELECT emprestimo.exm_id, exemplar.ISBN, livro.titulo, livro.edicao, COUNT(emp_id)
 		FROM 
 		emprestimo INNER JOIN exemplar ON emprestimo.exm_id = exemplar.exm_id 
-		INNER JOIN livro ON exemplar.ISBN = livro.ISBN   
+		INNER JOIN livro ON exemplar.ISBN = livro.ISBN
+		WHERE cast(DATE_PART(''month'',now() - emprestimo.data_inic) AS INTEGER) = $1
 		GROUP BY
 		emprestimo.exm_id, 
 		exemplar.ISBN, 
 		livro.titulo, 
 		livro.edicao
-		HAVING COUNT(emp_id) >30;
+		HAVING COUNT(emp_id) >30'
+		USING mesinter;
 		
 
 END;
