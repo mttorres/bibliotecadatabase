@@ -4,6 +4,7 @@
 -- CREATE TABLE usuario (
 
 -- usr_id int NOT NULL,
+-- rg text NOT NULL,
 -- nome character varying NOT NULL,
 -- tel character varying, 
 -- endereco character varying,
