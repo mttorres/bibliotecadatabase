@@ -77,7 +77,7 @@ BEGIN
 						RETURN NEW;
 					ELSE   
 						UPDATE suspensoes                            
-						SET suspensoes.dias = suspensoes.dias + diaslivro +(diastodos-5), -- evita contar 2 vezes!
+						SET suspensoes.dias = suspensoes.dias + diaslivro +(diastodos-((diastodos-5)), -- evita contar 2 vezes!
 						suspensoes.data_s = NEW.data_exp
 						WHERE usr_id = NEW.usr_id; 
 						RETURN NEW; 
